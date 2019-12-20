@@ -7,7 +7,7 @@ import os
 # VARIABLES
 SERVER_URL = "polymath-atlas.oraxen.com" # A constant actually: the first dedicated vps for polymath
 registry = {}
-
+packs_folder = "./packs/"
 
 #-----------SERVER-------------------
 
@@ -16,12 +16,8 @@ registry = {}
 async def upload(request):
     data = await request.post()
     id = data['id']
-    pack = data['pack']
     id_hash = hashlib.sha256(id.encode('utf-8')).hexdigest()[0:32]
-
-    packs_folder = "./packs/"
-    if not os.path.exists(packs_folder):
-        os.mkdir(packs_folder)
+    pack = data['pack']
 
     if os.path.exists(packs_folder + id_hash):
         os.remove(packs_folder + id_hash)
@@ -31,16 +27,16 @@ async def upload(request):
     register(id_hash, id, request.remote)
 
     return web.json_response({
-        "url" : "http://" + SERVER_URL + "/download&id=" + id_hash
+        "url" : "http://" + SERVER_URL + "/download?id=" + id_hash
     })
 
 # To download a resourcepack from its id
 async def download(request):
-    data = await request.get()
-    id = data['id']
-    # todo: check if a pack with this id exists
-    return web.FileResponse('./' + id + '/pack.zip')
-
+    params = request.rel_url.query
+    id_hash = params["id"]
+    if os.path.exists(packs_folder + id_hash):
+        update(id_hash)
+        return web.FileResponse(packs_folder + id_hash)
 
 #------------REGISTRY-------------
 def register(id_hash, id, ip):
@@ -53,7 +49,7 @@ def register(id_hash, id, ip):
 
 def update(id_hash):
     global registry
-    registry["id_hash"]["last_download_time"] = time.time()
+    registry[id_hash]["last_download_time"] = time.time()
 
 
 #----------START CODE--------
@@ -61,6 +57,9 @@ registry_file = './registry.json'
 if os.path.exists(registry_file):
     with open(registry_file) as json_file:
         registry = json.load(json_file)
+
+if not os.path.exists(packs_folder):
+    os.mkdir(packs_folder)
 
 app = web.Application()
 app.add_routes([web.post('/upload', upload),
