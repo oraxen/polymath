@@ -26,8 +26,8 @@ async def upload(request):
     if os.path.exists(packs_folder + id_hash):
         os.remove(packs_folder + id_hash)
 
-    with pack.file().open('w') as pack_file:
-        pack_file.write(packs_folder + id_hash)
+    with open(packs_folder + id_hash, 'wb') as pack_file:
+        pack_file.write(pack.file.read())
     register(id_hash, id, request.remote)
 
     return web.json_response({
@@ -45,9 +45,11 @@ async def download(request):
 #------------REGISTRY-------------
 def register(id_hash, id, ip):
     global registry
-    registry["id_hash"]["id"] = id
-    registry["id_hash"]["ip"] = ip
-    registry["id_hash"]["upload_time"] = time.time()
+    if id_hash not in registry:
+        registry[id_hash] = {}
+    registry[id_hash]["id"] = id
+    registry[id_hash]["ip"] = ip
+    registry[id_hash]["upload_time"] = time.time()
 
 def update(id_hash):
     global registry
@@ -58,7 +60,7 @@ def update(id_hash):
 registry_file = './registry.json'
 if os.path.exists(registry_file):
     with open(registry_file) as json_file:
-        registry = json_file
+        registry = json.load(json_file)
 
 app = web.Application()
 app.add_routes([web.post('/upload', upload),
@@ -67,7 +69,7 @@ web.run_app(app)
 
 #-----------EXIT CODE--------------
 with open(registry_file, 'w') as json_output_file:
-    json.dump(registry, registry_file)
+    json.dump(registry, json_output_file)
 
 # todo:
 # - keep a track of files (date of creation, ip, etc...)
