@@ -5,7 +5,7 @@ import time
 import os
 
 # VARIABLES
-SERVER_URL = "polymath-atlas.oraxen.com" # A constant actually: the first dedicated vps for polymath
+SERVER_URL = "atlas.oraxen.com" # A constant actually: the first dedicated vps for polymath
 registry = {}
 packs_folder = "./packs/"
 
