@@ -38,6 +38,10 @@ async def download(request):
         update(id_hash)
         return web.FileResponse(packs_folder + id_hash)
 
+# To debug
+async def debug(request):
+    return web.Response(body=b("It seems to be working..."))
+
 #------------REGISTRY-------------
 def register(id_hash, id, ip):
     global registry
@@ -63,7 +67,8 @@ if not os.path.exists(packs_folder):
 
 app = web.Application()
 app.add_routes([web.post('/upload', upload),
-                web.get('/download', download)])
+                web.get('/download', download),
+                web.get('/debug', debug)])
 web.run_app(app)
 
 #-----------EXIT CODE--------------
