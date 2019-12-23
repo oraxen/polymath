@@ -40,7 +40,7 @@ async def download(request):
 
 # To debug
 async def debug(request):
-    return web.Response(body=b("It seems to be working..."))
+    return web.Response(body="It seems to be working...")
 
 #------------REGISTRY-------------
 def register(id_hash, id, ip):
