@@ -12,7 +12,7 @@ packs_folder = "./packs/"
 #-----------SERVER-------------------
 
 # To upload a resourcepack with its id
-# test: curl -F "pack=./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload
+# test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload
 async def upload(request):
     data = await request.post()
     id = data['id']
