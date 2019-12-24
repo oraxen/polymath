@@ -5,7 +5,7 @@ import time
 import os
 
 # VARIABLES
-SERVER_URL = "atlas.oraxen.com" # A constant actually: the first dedicated vps for polymath
+SERVER_URL = "http://hestia.oraxen.com:8080" # A constant actually: the first dedicated vps for polymath
 registry = {}
 packs_folder = "./packs/"
 
@@ -27,7 +27,7 @@ async def upload(request):
     register(id_hash, id, request.remote)
 
     return web.json_response({
-        "url" : "http://" + SERVER_URL + "/download?id=" + id_hash
+        "url" : SERVER_URL + "/download?id=" + id_hash
     })
 
 # To download a resourcepack from its id
