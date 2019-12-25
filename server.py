@@ -44,7 +44,6 @@ async def debug(request):
 
 #------------REGISTRY-------------
 def register(id_hash, id, ip):
-    global registry
     if id_hash not in registry:
         registry[id_hash] = {}
     registry[id_hash]["id"] = id
@@ -52,7 +51,6 @@ def register(id_hash, id, ip):
     registry[id_hash]["upload_time"] = time.time()
 
 def update(id_hash):
-    global registry
     registry[id_hash]["last_download_time"] = time.time()
 
 
