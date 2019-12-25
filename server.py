@@ -6,7 +6,7 @@ from aiohttp import web
 
 # CONSTANTS
 SERVER_URL = "http://hestia.oraxen.com:8080" # The first dedicated vps for polymath
-PACKS_FOLDER = os.path.join(os.path.abspath(__file__), "packs")
+PACKS_FOLDER = "./packs"
 REGISTRY_FILE = './registry.json'
 REGISTRY = {}
 
