@@ -16,7 +16,7 @@ packs_folder = "./packs/"
 async def upload(request):
     data = await request.post()
     spigot_id = data['id']
-    id_hash = hashlib.sha256(id.encode('utf-8')).hexdigest()[0:32]
+    id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
     if os.path.exists(packs_folder + id_hash):
