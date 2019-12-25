@@ -9,6 +9,8 @@ SERVER_URL = "http://hestia.oraxen.com:8080" # A constant actually: the first de
 PACKS_FOLDER = "./packs/"
 REGISTRY = {}
 
+INSTANT_SAVE = True
+
 #-----------SERVER-------------------
 
 # To upload a resourcepack with a spigot id
@@ -26,6 +28,9 @@ async def upload(request):
         sha1.update(data)
         pack_file.write(data)
     register(id_hash, spigot_id, request.remote)
+
+    if INSTANT_SAVE:
+        write_to_file()
 
     return web.json_response({
         "url" : SERVER_URL + "/download?id=" + id_hash,
@@ -55,12 +60,21 @@ def register(id_hash, spigot_id, ip):
 def update(id_hash):
     REGISTRY[id_hash]["last_download_time"] = time.time()
 
-def main():
+def read_registry():
+    global REGISTRY_FILE
     #----------START CODE--------
-    REGISTRY_file = './REGISTRY.json'
-    if os.path.exists(REGISTRY_file):
-        with open(REGISTRY_file) as json_file:
-            REGISTRY = json.load(json_file)
+    REGISTRY_FILE = './registry.json'
+    if os.path.exists(REGISTRY_FILE):
+        with open(REGISTRY_FILE) as json_file:
+            registry = json.load(json_file)
+
+def write_to_file():
+    global REGISTRY_FILE
+    with open(REGISTRY_FILE, 'w') as json_output_file:
+        json.dump(REGISTRY, json_output_file)
+
+def main():
+    read_registry()
 
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
@@ -72,8 +86,8 @@ def main():
     web.run_app(app)
 
     #-----------EXIT CODE--------------
-    with open(REGISTRY_file, 'w') as json_output_file:
-        json.dump(REGISTRY, json_output_file)
+    if not INSTANT_SAVE:
+        write_to_file()
 
 if __name__ == '__main__':
     main()
