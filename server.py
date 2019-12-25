@@ -4,10 +4,10 @@ import json
 import time
 import os
 
-# VARIABLES
+# CONSTANTS
 SERVER_URL = "http://hestia.oraxen.com:8080" # A constant actually: the first dedicated vps for polymath
-registry = {}
-packs_folder = "./packs/"
+PACKS_FOLDER = "./packs/"
+REGISTRY = {}
 
 #-----------SERVER-------------------
 
@@ -19,10 +19,10 @@ async def upload(request):
     id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
-    if os.path.exists(packs_folder + id_hash):
-        os.remove(packs_folder + id_hash)
+    if os.path.exists(PACKS_FOLDER + id_hash):
+        os.remove(PACKS_FOLDER + id_hash)
 
-    with open(packs_folder + id_hash, 'wb') as pack_file:
+    with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
         pack_file.write(pack.file.read())
     register(id_hash, spigot_id, request.remote)
 
@@ -34,9 +34,9 @@ async def upload(request):
 async def download(request):
     params = request.rel_url.query
     id_hash = params["id"]
-    if os.path.exists(packs_folder + id_hash):
+    if os.path.exists(PACKS_FOLDER + id_hash):
         update(id_hash)
-        return web.FileResponse(packs_folder + id_hash)
+        return web.FileResponse(PACKS_FOLDER + id_hash)
 
 # To debug
 async def debug(request):
@@ -44,24 +44,24 @@ async def debug(request):
 
 #------------REGISTRY-------------
 def register(id_hash, spigot_id, ip):
-    if id_hash not in registry:
-        registry[id_hash] = {}
-    registry[id_hash]["id"] = spigot_id
-    registry[id_hash]["ip"] = ip
-    registry[id_hash]["upload_time"] = time.time()
+    if id_hash not in REGISTRY:
+        REGISTRY[id_hash] = {}
+    REGISTRY[id_hash]["id"] = spigot_id
+    REGISTRY[id_hash]["ip"] = ip
+    REGISTRY[id_hash]["upload_time"] = time.time()
 
 def update(id_hash):
-    registry[id_hash]["last_download_time"] = time.time()
+    REGISTRY[id_hash]["last_download_time"] = time.time()
 
 def main():
     #----------START CODE--------
-    registry_file = './registry.json'
-    if os.path.exists(registry_file):
-        with open(registry_file) as json_file:
-            registry = json.load(json_file)
+    REGISTRY_file = './REGISTRY.json'
+    if os.path.exists(REGISTRY_file):
+        with open(REGISTRY_file) as json_file:
+            REGISTRY = json.load(json_file)
 
-    if not os.path.exists(packs_folder):
-        os.mkdir(packs_folder)
+    if not os.path.exists(PACKS_FOLDER):
+        os.mkdir(PACKS_FOLDER)
 
     app = web.Application()
     app.add_routes([web.post('/upload', upload),
@@ -70,8 +70,8 @@ def main():
     web.run_app(app)
 
     #-----------EXIT CODE--------------
-    with open(registry_file, 'w') as json_output_file:
-        json.dump(registry, json_output_file)
+    with open(REGISTRY_file, 'w') as json_output_file:
+        json.dump(REGISTRY, json_output_file)
 
 if __name__ == '__main__':
     main()
