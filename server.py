@@ -53,26 +53,25 @@ def register(id_hash, spigot_id, ip):
 def update(id_hash):
     registry[id_hash]["last_download_time"] = time.time()
 
+def main():
+    #----------START CODE--------
+    registry_file = './registry.json'
+    if os.path.exists(registry_file):
+        with open(registry_file) as json_file:
+            registry = json.load(json_file)
 
-#----------START CODE--------
-registry_file = './registry.json'
-if os.path.exists(registry_file):
-    with open(registry_file) as json_file:
-        registry = json.load(json_file)
+    if not os.path.exists(packs_folder):
+        os.mkdir(packs_folder)
 
-if not os.path.exists(packs_folder):
-    os.mkdir(packs_folder)
+    app = web.Application()
+    app.add_routes([web.post('/upload', upload),
+                    web.get('/download', download),
+                    web.get('/debug', debug)])
+    web.run_app(app)
 
-app = web.Application()
-app.add_routes([web.post('/upload', upload),
-                web.get('/download', download),
-                web.get('/debug', debug)])
-web.run_app(app)
+    #-----------EXIT CODE--------------
+    with open(registry_file, 'w') as json_output_file:
+        json.dump(registry, json_output_file)
 
-#-----------EXIT CODE--------------
-with open(registry_file, 'w') as json_output_file:
-    json.dump(registry, json_output_file)
-
-# todo:
-# - keep a track of files (date of creation, ip, etc...)
-# - create a garbage collector
+if __name__ == '__main__':
+    main()
