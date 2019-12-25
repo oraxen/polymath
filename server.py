@@ -19,9 +19,6 @@ async def upload(request):
     id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
-    if os.path.exists(PACKS_FOLDER + id_hash):
-        os.remove(PACKS_FOLDER + id_hash)
-
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
         pack_file.write(pack.file.read())
     register(id_hash, spigot_id, request.remote)
