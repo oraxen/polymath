@@ -5,17 +5,18 @@ import os
 from aiohttp import web
 
 # CONSTANTS
-SERVER_URL = "http://hestia.oraxen.com:8080" # A constant actually: the first dedicated vps for polymath
-PACKS_FOLDER = "./packs/"
+SERVER_URL = "http://hestia.oraxen.com:8080" # The first dedicated vps for polymath
+PACKS_FOLDER = os.path.join(os.path.abspath(__file__), "packs")
+REGISTRY_FILE = './registry.json'
 REGISTRY = {}
 
 INSTANT_SAVE = True
 
 #-----------SERVER-------------------
 
-# To upload a resourcepack with a spigot id
-# test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload
 async def upload(request):
+    """" Allow to upload a resourcepack with a spigot id
+    test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
     data = await request.post()
     spigot_id = data['id']
     id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
@@ -41,6 +42,8 @@ async def upload(request):
 
 # To download a resourcepack from its id
 async def download(request):
+    """" Allow to download a resourcepack with a spigot id
+    test: curl http://localhost:8080/download?id=EXAMPLE """
     params = request.rel_url.query
     id_hash = params["id"]
     if os.path.exists(PACKS_FOLDER + id_hash):
@@ -49,10 +52,14 @@ async def download(request):
 
 # To debug
 async def debug(request):
+    """" Allow to test the connection
+    test: curl http://localhost:8080/debug """
     return web.Response(body="It seems to be working...")
 
 #------------REGISTRY-------------
 def register(id_hash, spigot_id, ip):
+    """ Store informations about the server
+    """
     if id_hash not in REGISTRY:
         REGISTRY[id_hash] = {}
     REGISTRY[id_hash]["id"] = spigot_id
@@ -60,22 +67,28 @@ def register(id_hash, spigot_id, ip):
     REGISTRY[id_hash]["upload_time"] = time.time()
 
 def update(id_hash):
+    """ Store the date of the last download of a pack
+    """
     REGISTRY[id_hash]["last_download_time"] = time.time()
 
 def read_registry():
-    global REGISTRY_FILE
+    """ Read olds registry informations on startup
+    """
+    global REGISTRY
     #----------START CODE--------
-    REGISTRY_FILE = './registry.json'
     if os.path.exists(REGISTRY_FILE):
         with open(REGISTRY_FILE) as json_file:
-            registry = json.load(json_file)
+            REGISTRY = json.load(json_file)
 
 def write_to_file():
-    global REGISTRY_FILE
+    """ Save registry informations to disk
+    """
     with open(REGISTRY_FILE, 'w') as json_output_file:
         json.dump(REGISTRY, json_output_file)
 
 def main():
+    """ Core process of the program
+    """
     read_registry()
 
     if not os.path.exists(PACKS_FOLDER):
