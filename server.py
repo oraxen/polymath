@@ -25,6 +25,8 @@ async def upload(request):
 
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
         data = pack.file.read()
+        if len(data) >= 100 * 2**10: # we don't accept file larger than 100MiB
+            return
         sha1.update(data)
         pack_file.write(data)
     register(id_hash, spigot_id, request.remote)
