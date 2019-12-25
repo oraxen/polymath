@@ -19,12 +19,17 @@ async def upload(request):
     id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
+    sha1 = hashlib.sha1()
+
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
-        pack_file.write(pack.file.read())
+        data = pack.file.read()
+        sha1.update(data)
+        pack_file.write(data)
     register(id_hash, spigot_id, request.remote)
 
     return web.json_response({
-        "url" : SERVER_URL + "/download?id=" + id_hash
+        "url" : SERVER_URL + "/download?id=" + id_hash,
+        "sha1" : sha1.hexdigest()
     })
 
 # To download a resourcepack from its id
