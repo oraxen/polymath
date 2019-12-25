@@ -13,7 +13,6 @@ REGISTRY = {}
 INSTANT_SAVE = True
 
 #-----------SERVER-------------------
-
 async def upload(request):
     """" Allow to upload a resourcepack with a spigot id
     test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
@@ -26,7 +25,7 @@ async def upload(request):
 
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
         data = pack.file.read()
-        if len(data) >= 100 * 2**10: # we don't accept file larger than 100MiB
+        if len(data) >= 10000 * 2**10: # we don't accept file larger than 100MiB
             return
         sha1.update(data)
         pack_file.write(data)
