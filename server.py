@@ -1,8 +1,8 @@
-from aiohttp import web
 import hashlib
 import json
 import time
 import os
+from aiohttp import web
 
 # CONSTANTS
 SERVER_URL = "http://hestia.oraxen.com:8080" # A constant actually: the first dedicated vps for polymath
