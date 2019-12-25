@@ -11,11 +11,11 @@ packs_folder = "./packs/"
 
 #-----------SERVER-------------------
 
-# To upload a resourcepack with its id
+# To upload a resourcepack with a spigot id
 # test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload
 async def upload(request):
     data = await request.post()
-    id = data['id']
+    spigot_id = data['id']
     id_hash = hashlib.sha256(id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
@@ -24,7 +24,7 @@ async def upload(request):
 
     with open(packs_folder + id_hash, 'wb') as pack_file:
         pack_file.write(pack.file.read())
-    register(id_hash, id, request.remote)
+    register(id_hash, spigot_id, request.remote)
 
     return web.json_response({
         "url" : SERVER_URL + "/download?id=" + id_hash
@@ -43,10 +43,10 @@ async def debug(request):
     return web.Response(body="It seems to be working...")
 
 #------------REGISTRY-------------
-def register(id_hash, id, ip):
+def register(id_hash, spigot_id, ip):
     if id_hash not in registry:
         registry[id_hash] = {}
-    registry[id_hash]["id"] = id
+    registry[id_hash]["id"] = spigot_id
     registry[id_hash]["ip"] = ip
     registry[id_hash]["upload_time"] = time.time()
 
