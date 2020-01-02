@@ -25,8 +25,6 @@ async def upload(request):
 
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
         data = pack.file.read()
-        if len(data) >= 10000 * 2**10: # we don't accept file larger than 100MiB
-            return
         sha1.update(data)
         pack_file.write(data)
     register(id_hash, spigot_id, request.remote)
@@ -93,7 +91,7 @@ def main():
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
 
-    app = web.Application()
+    app = web.Application(client_max_size = 10000 * 2**10) # we don't accept file larger than 100MiB
     app.add_routes([web.post('/upload', upload),
                     web.get('/download', download),
                     web.get('/debug', debug)])
