@@ -47,7 +47,7 @@ async def download(request):
         id_hash = id_hash[:-4]
     if os.path.exists(PACKS_FOLDER + id_hash):
         update(id_hash)
-        return web.FileResponse(PACKS_FOLDER + id_hash)
+        return web.FileResponse(PACKS_FOLDER + id_hash, headers = {'content-type': 'application/zip'})
 
 # To debug
 async def debug(request):
