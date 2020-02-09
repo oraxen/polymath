@@ -18,7 +18,7 @@ def clean_registry():
     for hash in registry:
         if not os.path.exists(polymath.PACKS_FOLDER + hash):
             print("removing not written ", hash)
-        elif time.time() - registry[hash]["upload_time"] > 3600*24*30: # one month old
+        elif time.time() - registry[hash]["last_download_time"] > 3600*24*30: # one month old
             print("removing old ", hash)
         else:
             registry_clone[hash] = registry[hash]

@@ -75,7 +75,7 @@ def register(id_hash, spigot_id, ip):
         REGISTRY[id_hash] = {}
     REGISTRY[id_hash]["id"] = spigot_id
     REGISTRY[id_hash]["ip"] = ip
-    REGISTRY[id_hash]["upload_time"] = time.time()
+    REGISTRY[id_hash]["last_download_time"] = time.time()
 
 def update(id_hash):
     """ Store the date of the last download of a pack
