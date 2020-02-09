@@ -55,8 +55,6 @@ async def download(request):
     id_hash = params["id"]
     if id_hash not in REGISTRY:
         return web.Response(body=b"Pack not found")
-    if (id_hash.endswith(".zip")):
-        id_hash = id_hash[:-4]
     if os.path.exists(PACKS_FOLDER + id_hash):
         update(id_hash)
         return web.FileResponse(PACKS_FOLDER + id_hash, headers = {'content-type': 'application/zip'})
@@ -116,7 +114,7 @@ def main():
 
     app = web.Application(client_max_size = 10000 * 2**10) # we don't accept file larger than 100MiB
     app.add_routes([web.post('/upload', upload),
-                    web.get('/download', download),
+                    web.get('/pack.zip', download),
                     web.get('/debug', debug)])
     web.run_app(app)
 
