@@ -43,6 +43,8 @@ async def download(request):
     test: curl http://localhost:8080/download?id=EXAMPLE """
     params = request.rel_url.query
     id_hash = params["id"]
+    if id_hash not in REGISTRY:
+        return web.Response(body=b"Pack not found")
     if (id_hash.endswith(".zip")):
         id_hash = id_hash[:-4]
     if os.path.exists(PACKS_FOLDER + id_hash):
