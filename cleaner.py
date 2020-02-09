@@ -5,6 +5,8 @@ import os
 
 registry = {}
 
+print(os.path.dirname(os.path.realpath(__file__)))
+
 if os.path.exists(polymath.REGISTRY_FILE):
     with open(polymath.REGISTRY_FILE) as json_file:
         registry = json.load(json_file)

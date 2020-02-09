@@ -4,10 +4,13 @@ import time
 import os
 from aiohttp import web
 
+def get_path(name):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), name)
+
 # CONSTANTS
 SERVER_URL = "http://atlas.oraxen.com:8080" # The first dedicated vps for polymath
-PACKS_FOLDER = "./packs/"
-REGISTRY_FILE = './registry.json'
+PACKS_FOLDER = get_path("packs/")
+REGISTRY_FILE = get_path("registry.json")
 REGISTRY = {}
 
 INSTANT_SAVE = True
