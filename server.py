@@ -43,7 +43,7 @@ async def upload(request):
         write_to_file()
 
     return web.json_response({
-        "url" : SERVER_URL + "/download?id=" + id_hash,
+        "url" : SERVER_URL + "/pack.zip?id=" + id_hash,
         "sha1" : id_hash
     })
 
