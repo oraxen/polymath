@@ -12,6 +12,8 @@ SERVER_URL = "http://atlas.oraxen.com:8080" # The first dedicated vps for polyma
 PACKS_FOLDER = get_path("packs/")
 REGISTRY_FILE = get_path("registry.json")
 REGISTRY = {}
+BLACKLIST_FILE = get_path("blacklist.json")
+BLACKLIST = []
 
 INSTANT_SAVE = True
 
@@ -21,6 +23,12 @@ async def upload(request):
     test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
     data = await request.post()
     spigot_id = data['id']
+
+    if spigot_id in BLACKLIST:
+        return web.json_response({
+            "error" : "This license has been disabled"
+        })
+
     pack = data['pack']
 
     sha1 = hashlib.sha1()
@@ -82,6 +90,15 @@ def read_registry():
     if os.path.exists(REGISTRY_FILE):
         with open(REGISTRY_FILE) as json_file:
             REGISTRY = json.load(json_file)
+
+def read_blacklist():
+    """ Read olds registry informations on startup
+    """
+    global BLACKLIST
+    #----------START CODE--------
+    if os.path.exists(BLACKLIST_FILE):
+        with open(BLACKLIST_FILE) as json_file:
+            BLACKLIST = json.load(json_file)
 
 def write_to_file():
     """ Save registry informations to disk
