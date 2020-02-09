@@ -18,14 +18,13 @@ async def upload(request):
     test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
     data = await request.post()
     spigot_id = data['id']
-    id_hash = hashlib.sha256(spigot_id.encode('utf-8')).hexdigest()[0:32]
     pack = data['pack']
 
     sha1 = hashlib.sha1()
-
+    data = pack.file.read()
+    sha1.update(data)
+    id_hash = sha1.hexdigest()
     with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
-        data = pack.file.read()
-        sha1.update(data)
         pack_file.write(data)
     register(id_hash, spigot_id, request.remote)
 
@@ -34,7 +33,7 @@ async def upload(request):
 
     return web.json_response({
         "url" : SERVER_URL + "/download?id=" + id_hash,
-        "sha1" : sha1.hexdigest()
+        "sha1" : id_hash
     })
 
 # To download a resourcepack from its id
