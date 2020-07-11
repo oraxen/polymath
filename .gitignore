@@ -1,7 +1,7 @@
 file.zip
 registry.json
-./packs
-./packs/**
+packs
+packs/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
