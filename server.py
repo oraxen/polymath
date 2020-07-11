@@ -91,7 +91,7 @@ class PolymathServer:
     def _update(self, id_hash):
         """ Store the date of the last download of a pack
         """
-        REGISTRY[id_hash]["last_download_time"] = time.time()
+        self.registry[id_hash]["last_download_time"] = time.time()
 
 def read_file(file):
     """ Read olds registry informations on startup
