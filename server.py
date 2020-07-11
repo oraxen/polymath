@@ -18,9 +18,10 @@ INSTANT_SAVE = True
 #-----------SERVER-------------------
 class PolymathServer:
 
-    def __init__(self, blacklist, packs_folder):
+    def __init__(self, blacklist, registry, packs_folder):
         self.server_url = "http://atlas.oraxen.com:8080" # The first dedicated vps for polymath
         self.blacklist = blacklist
+        self.registry = registry
         self.packs_folder = packs_folder
         self.app = web.Application(client_max_size = 10000 * 2**10) # we don't accept file larger than 100MiB
         self.app.add_routes([web.post('/upload', self.upload),
@@ -65,7 +66,7 @@ class PolymathServer:
         test: curl http://localhost:8080/download?id=EXAMPLE """
         params = request.rel_url.query
         id_hash = params["id"]
-        if id_hash not in REGISTRY:
+        if id_hash not in self.registry:
             return web.Response(body=b"Pack not found")
         if os.path.exists(self.packs_folder + id_hash):
             self._update(id_hash)
@@ -81,11 +82,11 @@ class PolymathServer:
     def _register(self, id_hash, spigot_id, ip):
         """ Store informations about the server
         """
-        if id_hash not in REGISTRY:
-            REGISTRY[id_hash] = {}
-        REGISTRY[id_hash]["id"] = spigot_id
-        REGISTRY[id_hash]["ip"] = ip
-        REGISTRY[id_hash]["last_download_time"] = time.time()
+        if id_hash not in self.registry:
+            self.registry[id_hash] = {}
+        self.registry[id_hash]["id"] = spigot_id
+        self.registry[id_hash]["ip"] = ip
+        self.registry[id_hash]["last_download_time"] = time.time()
 
     def _update(self, id_hash):
         """ Store the date of the last download of a pack
@@ -110,13 +111,13 @@ def main():
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
 
-    server = PolymathServer(BLACKLIST, PACKS_FOLDER)
+    server = PolymathServer(BLACKLIST, REGISTRY, PACKS_FOLDER)
     server.start()
 
     #-----------EXIT CODE--------------
     if not INSTANT_SAVE:
         with open(REGISTRY_FILE, 'w') as json_output_file:
-            json.dump(REGISTRY, json_output_file)
+            json.dump(server.registry, json_output_file)
 
 if __name__ == '__main__':
     main()
