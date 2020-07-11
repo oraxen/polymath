@@ -125,7 +125,7 @@ def main():
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
 
-    server = PolymathServer(BLACKLIST, REGISTRY, PACKS_FOLDER)
+    server = PolymathServer(BLACKLIST, REGISTRY, REGISTRY_FILE, PACKS_FOLDER)
     server.start()
 
     # -----------EXIT CODE--------------
