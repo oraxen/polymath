@@ -8,119 +8,115 @@ def get_path(name):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), name)
 
 # CONSTANTS
-SERVER_URL = "http://atlas.oraxen.com:8080" # The first dedicated vps for polymath
+
 PACKS_FOLDER = get_path("packs/")
 REGISTRY_FILE = get_path("registry.json")
-REGISTRY = {}
 BLACKLIST_FILE = get_path("blacklist.json")
-BLACKLIST = []
 
 INSTANT_SAVE = True
 
 #-----------SERVER-------------------
-async def upload(request):
-    """" Allow to upload a resourcepack with a spigot id
-    test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
-    data = await request.post()
-    spigot_id = data['id']
+class PolymathServer:
 
-    if spigot_id in BLACKLIST:
+    def __init__(self, blacklist, packs_folder):
+        self.server_url = "http://atlas.oraxen.com:8080" # The first dedicated vps for polymath
+        self.blacklist = blacklist
+        self.packs_folder = packs_folder
+        self.app = web.Application(client_max_size = 10000 * 2**10) # we don't accept file larger than 100MiB
+        self.app.add_routes([web.post('/upload', self.upload),
+                        web.get('/pack.zip', self.download),
+                        web.get('/debug', self.debug)])
+
+    def start(self):
+        web.run_app(self.app)
+
+    async def upload(self, request):
+        """" Allow to upload a resourcepack with a spigot id
+        test: curl -F "pack=@./file.zip" -F "id=EXAMPLE" -X POST http://localhost:8080/upload """
+        data = await request.post()
+        spigot_id = data['id']
+
+        if spigot_id in self.blacklist:
+            return web.json_response({
+                "error" : "This license has been disabled"
+            })
+
+        pack = data['pack']
+
+        sha1 = hashlib.sha1()
+        data = pack.file.read()
+        sha1.update(data)
+        id_hash = sha1.hexdigest()
+        with open(self.packs_folder + id_hash, 'wb') as pack_file:
+            pack_file.write(data)
+        self._register(id_hash, spigot_id, request.remote)
+
+        if INSTANT_SAVE:
+            write_to_file()
+
         return web.json_response({
-            "error" : "This license has been disabled"
+            "url" : self.server_url + "/pack.zip?id=" + id_hash,
+            "sha1" : id_hash
         })
 
-    pack = data['pack']
+    # To download a resourcepack from its id
+    async def download(self, request):
+        """" Allow to download a resourcepack with a spigot id
+        test: curl http://localhost:8080/download?id=EXAMPLE """
+        params = request.rel_url.query
+        id_hash = params["id"]
+        if id_hash not in REGISTRY:
+            return web.Response(body=b"Pack not found")
+        if os.path.exists(self.packs_folder + id_hash):
+            self._update(id_hash)
+            return web.FileResponse(self.packs_folder + id_hash, headers = {'content-type': 'application/zip'})
 
-    sha1 = hashlib.sha1()
-    data = pack.file.read()
-    sha1.update(data)
-    id_hash = sha1.hexdigest()
-    with open(PACKS_FOLDER + id_hash, 'wb') as pack_file:
-        pack_file.write(data)
-    register(id_hash, spigot_id, request.remote)
+    # To debug
+    async def debug(self, request):
+        """" Allow to test the connection
+        test: curl http://localhost:8080/debug """
+        return web.Response(body="It seems to be working...")
 
-    if INSTANT_SAVE:
-        write_to_file()
+    #------------REGISTRY-------------
+    def _register(self, id_hash, spigot_id, ip):
+        """ Store informations about the server
+        """
+        if id_hash not in REGISTRY:
+            REGISTRY[id_hash] = {}
+        REGISTRY[id_hash]["id"] = spigot_id
+        REGISTRY[id_hash]["ip"] = ip
+        REGISTRY[id_hash]["last_download_time"] = time.time()
 
-    return web.json_response({
-        "url" : SERVER_URL + "/pack.zip?id=" + id_hash,
-        "sha1" : id_hash
-    })
+    def _update(self, id_hash):
+        """ Store the date of the last download of a pack
+        """
+        REGISTRY[id_hash]["last_download_time"] = time.time()
 
-# To download a resourcepack from its id
-async def download(request):
-    """" Allow to download a resourcepack with a spigot id
-    test: curl http://localhost:8080/download?id=EXAMPLE """
-    params = request.rel_url.query
-    id_hash = params["id"]
-    if id_hash not in REGISTRY:
-        return web.Response(body=b"Pack not found")
-    if os.path.exists(PACKS_FOLDER + id_hash):
-        update(id_hash)
-        return web.FileResponse(PACKS_FOLDER + id_hash, headers = {'content-type': 'application/zip'})
-
-# To debug
-async def debug(request):
-    """" Allow to test the connection
-    test: curl http://localhost:8080/debug """
-    return web.Response(body="It seems to be working...")
-
-#------------REGISTRY-------------
-def register(id_hash, spigot_id, ip):
-    """ Store informations about the server
-    """
-    if id_hash not in REGISTRY:
-        REGISTRY[id_hash] = {}
-    REGISTRY[id_hash]["id"] = spigot_id
-    REGISTRY[id_hash]["ip"] = ip
-    REGISTRY[id_hash]["last_download_time"] = time.time()
-
-def update(id_hash):
-    """ Store the date of the last download of a pack
-    """
-    REGISTRY[id_hash]["last_download_time"] = time.time()
-
-def read_registry():
+def read_file(file):
     """ Read olds registry informations on startup
     """
-    global REGISTRY
     #----------START CODE--------
-    if os.path.exists(REGISTRY_FILE):
-        with open(REGISTRY_FILE) as json_file:
-            REGISTRY = json.load(json_file)
+    if os.path.exists(file):
+        with open(file) as json_file:
+            return json.load(json_file)
 
-def read_blacklist():
-    """ Read olds registry informations on startup
-    """
-    global BLACKLIST
-    #----------START CODE--------
-    if os.path.exists(BLACKLIST_FILE):
-        with open(BLACKLIST_FILE) as json_file:
-            BLACKLIST = json.load(json_file)
-
-def write_to_file():
-    """ Save registry informations to disk
-    """
-    with open(REGISTRY_FILE, 'w') as json_output_file:
-        json.dump(REGISTRY, json_output_file)
 
 def main():
     """ Core process of the program
     """
-    read_registry()
+    REGISTRY = read_file(REGISTRY_FILE)
+    BLACKLIST = read_file(BLACKLIST_FILE)
 
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
 
-    app = web.Application(client_max_size = 10000 * 2**10) # we don't accept file larger than 100MiB
-    app.add_routes([web.post('/upload', upload),
-                    web.get('/pack.zip', download),
-                    web.get('/debug', debug)])
-    web.run_app(app)
+    server = PolymathServer(BLACKLIST, PACKS_FOLDER)
+    server.start()
 
     #-----------EXIT CODE--------------
     if not INSTANT_SAVE:
-        write_to_file()
+        with open(REGISTRY_FILE, 'w') as json_output_file:
+            json.dump(REGISTRY, json_output_file)
 
 if __name__ == '__main__':
     main()
