@@ -90,7 +90,7 @@ class PolymathServer:
     # ------------REGISTRY-------------
     def write_to_file(self):
         with open(self.registry_file, "w") as json_output_file:
-            json.dump(server.registry, json_output_file)
+            json.dump(self.registry, json_output_file)
 
     def _register(self, id_hash, spigot_id, ip):
         """ Store informations about the server
@@ -121,6 +121,10 @@ def main():
     """
     REGISTRY = read_file(REGISTRY_FILE)
     BLACKLIST = read_file(BLACKLIST_FILE)
+    if not REGISTRY:
+        REGISTRY = {}
+    if not BLACKLIST:
+        BLACKLIST = []
 
     if not os.path.exists(PACKS_FOLDER):
         os.mkdir(PACKS_FOLDER)
@@ -129,7 +133,7 @@ def main():
     server.start()
 
     # -----------EXIT CODE--------------
-    if not INSTANT_SAVE:
+    if not INSTANT_SAVE and server.registry:
         server.write_to_file()
 
 
