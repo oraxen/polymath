@@ -21,7 +21,7 @@ INSTANT_SAVE = True
 class PolymathServer:
     def __init__(self, blacklist, registry, registry_file, packs_folder):
         self.server_url = (
-            "http://atlas.oraxen.com:8080"  # The first dedicated vps for polymath
+            "https://atlas.oraxen.com"  # The first dedicated vps for polymath
         )
         self.blacklist = blacklist
         self.registry = registry
