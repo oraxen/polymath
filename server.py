@@ -39,7 +39,7 @@ class PolymathServer:
         )
 
     def start(self):
-        web.run_app(self.app)
+        web.run_app(self.app, host='127.0.0.1', port=2080)
 
     async def upload(self, request):
         """" Allow to upload a resourcepack with a spigot id
