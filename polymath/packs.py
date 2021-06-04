@@ -20,7 +20,7 @@ class PacksManager:
         sha1.update(pack)
         id_hash = sha1.hexdigest()
 
-        with open(self.packs_folder + id_hash, "wb") as pack_file:
+        with open(os.path.join(self.packs_folder, id_hash), "wb") as pack_file:
             pack_file.write(pack)
 
         self.registry[id_hash] = {
@@ -32,7 +32,7 @@ class PacksManager:
         return id_hash
 
     def fetch(self, id_hash):
-        output = self.packs_folder + id_hash
+        output = os.path.join(self.packs_folder, id_hash)
         if id_hash in self.registry and os.path.exists(output):
             self.registry[id_hash]["last_download"] = time.time()
             return output
