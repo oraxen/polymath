@@ -24,6 +24,5 @@ class TomlConfig(Config):
     def load(self, config_file):
         self._config = toml.load(config_file)
 
-    @property
-    def as_dict(self):
-        return self._config
+    def __getitem__(self, key):
+        return self._config[key]

@@ -1,2 +1,6 @@
 [server]
-url = "http://atlas.oraxen.com:8080"
+port = "80"
+url = "http://atlas.oraxen.com"
+
+[request]
+max_size = 100000000

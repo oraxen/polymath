@@ -2,7 +2,7 @@ from aiohttp import web
 
 
 def setup(app, config, packs_manager):
-    routes = Routes(config.as_dict, packs_manager)
+    routes = Routes(config, packs_manager)
     app.add_routes(
         [
             web.post("/upload", routes.upload),
