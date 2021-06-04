@@ -10,7 +10,7 @@ async def start(packs_manager, config):
 
 
 def clean(packs_manager, config):
-    for id_hash in list(packs_manager.registry.keys()): # workaround to "copy" the keys
+    for id_hash in list(packs_manager.registry.keys()):  # workaround to "copy" the keys
         pack = packs_manager.registry[id_hash]
         pack_file = packs_manager.packs_folder + id_hash
 
