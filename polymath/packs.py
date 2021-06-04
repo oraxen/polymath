@@ -26,7 +26,7 @@ class PacksManager:
         self.registry[id_hash] = {
             "id": spigot_id,
             "ip": ip,
-            "last_download": time.time(),
+            "last_download": int(time.time()),
         }
 
         return id_hash
