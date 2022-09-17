@@ -65,7 +65,7 @@ class Routes:
 
     # To download a resourcepack from its id
     async def download(self, request):
-        if self.config['server']['print_debug']: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received User Download request.")
+        if self.config['server']['print_debug']: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
         
         """
         Allow to download a resourcepack with a spigot id

@@ -1,7 +1,7 @@
 # Polymath
 
 Polymath is a web server designed to host resource packs of the Oraxen plugin.
-
+__ __
 ## How to use Polymath
 
 - Clone the project
@@ -44,3 +44,36 @@ toml
 ./run``
 
 - Polymath should now be running
+
+__ __
+## How to use on Pterodactyl or Windows
+
+- Clone the project
+``git clone git@github.com:oraxen/Polymath`` or ``git clone https://github.com/oraxen/Polymath``
+
+- Install [Python](https://python.org) (tested on 3.10!)
+
+- install following requirements (use pip or requirements.txt)
+```
+aiohttp>=3.7.4
+toml>=0.10.2
+colorama>=0.4.5
+```
+
+- use python to start /polymouth/core.py
+
+#### you **must** setup SSL for this to work! 
+
+### if using nginx:
+- setup a new vhost in /etc/nginx/sites-available/
+- setup ssl (u can use [certbot](https://certbot.eff.org/))
+- change the location of the VHOST to something like: 
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header X-Real-IP $remote_addr;
+    client_max_body_size 10M;
+}
+```
+> i recommend using a subdomain like texture.example.xyz
+- make sure port 443 is forwarded!
