@@ -60,7 +60,7 @@ toml>=0.10.2
 colorama>=0.4.5
 ```
 
-- use python to start /polymouth/core.py
+- use python to start /polymath/core.py
 
 #### you **must** setup SSL for this to work! 
 
