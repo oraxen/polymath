@@ -33,7 +33,7 @@ class Routes:
         # set the IP depending on the enviroment.        
         Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
 
-        if self.config['server']['print_debug']: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
+        if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] < 2: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
         
         """
         Allow to upload a resourcepack with a spigot id
@@ -65,7 +65,7 @@ class Routes:
 
     # To download a resourcepack from its id
     async def download(self, request):
-        if self.config['server']['print_debug']: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
+        if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
         
         """
         Allow to download a resourcepack with a spigot id

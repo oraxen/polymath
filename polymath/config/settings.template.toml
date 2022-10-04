@@ -1,8 +1,6 @@
 [server]
 port = "8080"
 url = "http://atlas.oraxen.com:8080"
-print_debug = false
-print_startup = "hello pterodactyl" # use this to give pterodactyl the started signal!
 
 [request]
 max_size = 100000000 # 100 MB
@@ -12,7 +10,12 @@ delay = 21600 # every 6 hours
 pack_lifespan = 604800 # remove a pack after 7 days without downloads
 
 [nginx]
-enabled = false
+enabled = false # enable nginx support / can be used for other webservers as well.
 ip_header = "X-Real-IP" # the header in which the IP is saved
 only_listen_nginx = true # sets the listen host to below if needed.
 nginx_location = "127.0.0.1"  # if nginx is running on same host, may be different depen. the env.
+
+[extra]
+print_debug = true # enable printing debug
+debug_level = 0 # 0 : all requests, 1 : upload only, 2 : only debug
+print_startup = "hello pterodactyl" # use this to give pterodactyl the started signal!

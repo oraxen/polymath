@@ -18,7 +18,7 @@ async def main():
     packs_manager = PacksManager(config)
     server.setup(app, config, packs_manager)
 
-    print(config['server']['print_startup'])
+    print(config['extra']['print_startup'])
     _ = os.system('cls') if os.name == 'nt' else os.system('clear')
 
     print("Oraxen Polymouth Listening on: http://"+host_ip+':'+config["server"]["port"])
