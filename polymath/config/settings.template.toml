@@ -16,6 +16,13 @@ only_listen_nginx = true # sets the listen host to below if needed.
 nginx_location = "127.0.0.1"  # if nginx is running on same host, may be different depen. the env.
 
 [extra]
-print_debug = true # enable printing debug
-debug_level = 0 # 0 : all requests, 1 : upload only, 2 : only debug
+# Set a Debug level to log requests.
+# 10 : Debug (print everything)
+# 20 : Info (only more important informations)
+# 30 : Only Warnings. (e.g. weird requests)
+debug_level = 20
+
+# set this to -1 to disable, else specify a filename!
+log2file = -1
+
 print_startup = "hello pterodactyl" # use this to give pterodactyl the started signal!

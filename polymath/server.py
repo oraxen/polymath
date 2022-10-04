@@ -1,4 +1,5 @@
-from numbers import Real
+import logging
+
 from aiohttp import web
 from datetime import datetime
 from colorama import Fore,init
@@ -33,7 +34,8 @@ class Routes:
         # set the IP depending on the enviroment.        
         Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
 
-        if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] < 2: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
+        # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] < 2: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
+        logging.info("Received Upload request from: "+Real_IP)
         
         """
         Allow to upload a resourcepack with a spigot id
@@ -65,7 +67,8 @@ class Routes:
 
     # To download a resourcepack from its id
     async def download(self, request):
-        if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
+        # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
+        logging.debug("Received User Download request.")
         
         """
         Allow to download a resourcepack with a spigot id
@@ -87,7 +90,7 @@ class Routes:
             return web.FileResponse(pack, headers={"content-type": "application/zip"})
 
     async def debug(self, request):
-        print(self.timestamp()+Fore.YELLOW+"[DEBUG] "+Fore.RESET+str(type(request)))
+        logging.warning(str(type(request)))
         """
         Allow to test the connection
 
