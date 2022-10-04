@@ -12,7 +12,7 @@ async def main():
     if not config.configured:
         return
 
-    host_ip = config['nginx']['nginx_location'] if config['server']['nginx'] and config['nginx']['only_listen_nginx'] else '0.0.0.0'
+    host_ip = config['nginx']['nginx_location'] if config['nginx']['enabled'] and config['nginx']['only_listen_nginx'] else '0.0.0.0'
     
     app = web.Application(client_max_size=config["request"]["max_size"])
     packs_manager = PacksManager(config)

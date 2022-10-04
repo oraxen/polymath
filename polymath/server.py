@@ -31,7 +31,7 @@ class Routes:
     
     async def upload(self, request):
         # set the IP depending on the enviroment.        
-        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["server"]["nginx"] else request.remote
+        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
 
         if self.config['server']['print_debug']: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
         
