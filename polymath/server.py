@@ -83,12 +83,15 @@ class Routes:
                 pack (web.FileResponse): the resource pack
         """
         params = request.rel_url.query
-        pack = self.packs.fetch(params["id"])
-        if not pack:
-            return web.Response(body=b"Pack not found")
-        else:
-            return web.FileResponse(pack, headers={"content-type": "application/zip"})
-
+        try:
+            pack = self.packs.fetch(params["id"])
+            if not pack:
+                return web.Response(body=b"Pack not found")
+            else:
+                return web.FileResponse(pack, headers={"content-type": "application/zip"})
+        except TimeoutError:
+            logging.warn("Download Request timed out!")
+            
     async def debug(self, request):
         logging.warning(str(type(request)))
         """
