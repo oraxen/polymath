@@ -1,4 +1,5 @@
 import logging
+import re
 
 from aiohttp import web
 from datetime import datetime
@@ -33,9 +34,15 @@ class Routes:
     async def upload(self, request):
         # set the IP depending on the enviroment.        
         Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
-
-        # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] < 2: print(self.timestamp()+Fore.GREEN+"[UPLOAD]"+Fore.RESET+" Received Upload request from: "+Real_IP)
         logging.info("Received Upload request from: "+Real_IP)
+        
+        User_Agent = request.headers['User-Agent'] 
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['uploads']] ):
+            if self.config['security']['block_unknown_agents'] and self.config['security']['reject_upload']:
+                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                return web.json_response({"error": "Unknown Application"}) 
+            else:
+                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
         
         """
         Allow to upload a resourcepack with a spigot id
@@ -70,6 +77,15 @@ class Routes:
         # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
         logging.debug("Received User Download request.")
         
+        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
+        User_Agent = request.headers['User-Agent'] 
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['download']] ):
+            if self.config['security']['block_unknown_agents'] and self.config['security']['reject_download']:
+                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                return web.json_response({"error": "Unknown Application"}) 
+            else:
+                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
+                
         """
         Allow to download a resourcepack with a spigot id
 

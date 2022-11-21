@@ -26,3 +26,11 @@ debug_level = 20
 log2file = -1
 
 print_startup = "hello pterodactyl" # use this to give pterodactyl the started signal!
+
+[security]
+block_unknown_agents = false # should rejecting be used at all?, False disables it completly
+reject_upload = true # only reject upload from unknown Applications
+reject_download = false # same as above but for download.
+
+# Set known application user-agents, these are used as Regex to match more easily
+known_agents = { upload = ["Apache-HttpClient.*"], download = ["Minecraft Java.*"] }
