@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+
+  polymath:
+    container_name: polymath
+    build: .
+    command: python -u run
+    restart: always
+    ports:
+      - 8080:8080
+    volumes:
+      - ./_docker/polymath:/polymath/polymath/storage
+
+  nginx:
+    image: valian/docker-nginx-auto-ssl
+    restart: on-failure
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ssl_data:/etc/resty-auto-ssl
+    environment:
+      ALLOWED_DOMAINS: 'atlas.oraxen.com'
+      SITES: 'atlas.oraxen.com=polymath:8080'
+      FORCE_HTTPS: false
+
+volumes:
+  ssl_data:
