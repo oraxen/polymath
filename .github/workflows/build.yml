@@ -27,10 +27,9 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
       - name: Set up Build Environment
-        run: echo "DOCKER_IMAGE=${REPO_OWNER,,}/${REPO_NAME,,}" >> $GITHUB_ENV
+        run: echo "DOCKER_IMAGE=${GITHUB_REPO,,}" >> $GITHUB_ENV
         env:
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.repository_name }}
+          GITHUB_REPO: ${{ github.repository }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
