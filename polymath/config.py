@@ -1,7 +1,7 @@
 import os
-import toml
 import shutil
-import utils
+from polymath import utils
+import toml
 
 
 class Config:

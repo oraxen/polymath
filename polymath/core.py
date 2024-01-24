@@ -1,12 +1,12 @@
-from config import TomlConfig
-from packs import PacksManager
+from polymath.config import TomlConfig
+from polymath.packs import PacksManager
 from aiohttp import web
 from colorama import Fore,init
 import asyncio
-import server
-import cleaner
+from polymath import server
+from polymath import cleaner
 import os
-import logging
+import logging 
 
 init()
 

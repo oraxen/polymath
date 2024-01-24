@@ -23,7 +23,7 @@ services:
     environment:
       ALLOWED_DOMAINS: 'atlas.oraxen.com'
       SITES: 'atlas.oraxen.com=polymath:8080'
-      FORCE_HTTPS: false
+      FORCE_HTTPS: "false"
 
 volumes:
   ssl_data:
