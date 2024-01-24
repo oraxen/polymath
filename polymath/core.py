@@ -1,9 +1,9 @@
-from config import TomlConfig
-from packs import PacksManager
+from polymath.config import TomlConfig
+from polymath.packs import PacksManager
 from aiohttp import web
 import asyncio
-import server
-import cleaner
+from polymath import server
+from polymath import cleaner
 
 
 async def main():
