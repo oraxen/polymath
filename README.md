@@ -6,10 +6,12 @@ __ __
 
 - Clone the project
 ``git clone git@github.com:oraxen/Polymath`` or ``git clone https://github.com/oraxen/Polymath``
+this fork: ``git clone git@github.com:oOHiyoriOo/polymath.git`` or ``git clone https://github.com/oOHiyoriOo/polymath.git``
 
 - Cd in the directory
 ``cd ./Polymath``
 
+#### With nix package management
 - Install nix
 Follow this tutorial (you only need nix, not nixos): https://nixos.org/download.html
 On linux this is just this command:
@@ -21,6 +23,8 @@ You can check the website to get it working on windows or docker.
 - Install the required libs
 If you installed nix, just type:
 ``nix-shell``
+
+#### Without nix package management (and Windows)
 If you didn't install nix, you need to install Python 3.8 with those packages:
 ```
 cython
@@ -53,15 +57,17 @@ __ __
 
 - Install [Python](https://python.org) (tested on 3.10!)
 
-- install following requirements (use pip or requirements.txt)
+- install following requirements (use pip or requirements.txt):
+``pip  install -r requirements.txt``
+
+- run:  `python run`
+- 
+##### Installing Requirements:
 ```
 aiohttp>=3.7.4
 toml>=0.10.2
 colorama>=0.4.5
 ```
-
-- use python to start /polymath/core.py
-
 #### you **must** setup SSL for this to work! 
 
 ### if using nginx:
