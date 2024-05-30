@@ -8,3 +8,29 @@ max_size = 100000000 # 100 MB
 [cleaner]
 delay = 21600 # every 6 hours
 pack_lifespan = 604800 # remove a pack after 7 days without downloads
+
+[nginx]
+enabled = false # enable nginx support / can be used for other webservers as well.
+ip_header = "X-Real-IP" # the header in which the IP is saved
+only_listen_nginx = true # sets the listen host to below if needed.
+nginx_location = "127.0.0.1"  # if nginx is running on same host, may be different depen. the env.
+
+[extra]
+# Set a Debug level to log requests.
+# 10 : Debug (print everything)
+# 20 : Info (only more important informations)
+# 30 : Only Warnings. (e.g. weird requests)
+debug_level = 20
+
+# set this to -1 to disable, else specify a filename!
+log2file = -1
+
+print_startup = "hello pterodactyl" # use this to give pterodactyl the started signal!
+
+[security]
+block_unknown_agents = false # should rejecting be used at all?, False disables it completly
+reject_upload = true # only reject upload from unknown Applications
+reject_download = false # same as above but for download.
+
+# Set known application user-agents, these are used as Regex to match more easily
+known_agents = { upload = ["Apache-HttpClient.*"], download = ["Minecraft Java.*"] }

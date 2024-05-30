@@ -1,5 +1,10 @@
-from aiohttp import web
+import logging
+import re
 
+from aiohttp import web
+from datetime import datetime
+from colorama import Fore,init
+init()
 
 def setup(app, config, packs_manager):
     routes = Routes(config, packs_manager)
@@ -20,7 +25,25 @@ class Routes:
     def start(self):
         web.run_app(self.app)
 
+    def timestamp(self):
+        # "%m/%d/%Y, %H:%M:%S"
+        # 06/12/2018, 09:55:22
+        now = datetime.now()
+        return "["+now.strftime("%m/%d/%Y")+"]["+now.strftime("%H:%M:%S")+"]"
+    
     async def upload(self, request):
+        # set the IP depending on the enviroment.        
+        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
+        logging.info("Received Upload request from: "+Real_IP)
+        
+        User_Agent = request.headers['User-Agent'] 
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['uploads']] ):
+            if self.config['security']['block_unknown_agents'] and self.config['security']['reject_upload']:
+                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                return web.json_response({"error": "Unknown Application"}) 
+            else:
+                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
+        
         """
         Allow to upload a resourcepack with a spigot id
 
@@ -40,7 +63,7 @@ class Routes:
             return web.json_response({"error": "This license has been disabled"})
 
         pack = data["pack"].file.read()
-        id_hash = self.packs.register(pack, spigot_id, request.remote)
+        id_hash = self.packs.register(pack, spigot_id, Real_IP) # use the above header if behind e.x.: nginx
 
         return web.json_response(
             {
@@ -51,6 +74,18 @@ class Routes:
 
     # To download a resourcepack from its id
     async def download(self, request):
+        # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
+        logging.debug("Received User Download request.")
+        
+        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
+        User_Agent = request.headers['User-Agent'] 
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['download']] ):
+            if self.config['security']['block_unknown_agents'] and self.config['security']['reject_download']:
+                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                return web.json_response({"error": "Unknown Application"}) 
+            else:
+                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
+                
         """
         Allow to download a resourcepack with a spigot id
 
@@ -64,14 +99,17 @@ class Routes:
                 pack (web.FileResponse): the resource pack
         """
         params = request.rel_url.query
-        pack = self.packs.fetch(params["id"])
-        if not pack:
-            return web.Response(body=b"Pack not found")
-        else:
-            return web.FileResponse(pack, headers={"content-type": "application/zip"})
-
+        try:
+            pack = self.packs.fetch(params["id"])
+            if not pack:
+                return web.Response(body=b"Pack not found")
+            else:
+                return web.FileResponse(pack, headers={"content-type": "application/zip"})
+        except TimeoutError:
+            logging.warn("Download Request timed out!")
+            
     async def debug(self, request):
-        print(type(request))
+        logging.warning(str(type(request)))
         """
         Allow to test the connection
 
