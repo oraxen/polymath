@@ -1,4 +1,4 @@
 cython
 aiohttp
 toml
-colorama
+colorama>=0.4.5

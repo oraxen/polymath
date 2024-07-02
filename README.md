@@ -30,6 +30,7 @@ If you didn't install nix, you need to install Python 3.8 with those packages:
 cython
 aiohttp
 toml
+colorama
 ```
 
 - Build polymath
@@ -67,6 +68,7 @@ __ __
 aiohttp>=3.7.4
 toml>=0.10.2
 cython
+colorama
 ```
 #### you **must** setup SSL for this to work! 
 
