@@ -30,6 +30,7 @@ If you didn't install nix, you need to install Python 3.8 with those packages:
 cython
 aiohttp
 toml
+colorama
 ```
 
 - Build polymath
@@ -55,7 +56,7 @@ __ __
 - Clone the project
 ``git clone git@github.com:oraxen/Polymath`` or ``git clone https://github.com/oraxen/Polymath``
 
-- Install [Python](https://python.org) (tested on 3.10!)
+- Install [Python](https://python.org) (tested on Python 3.12.3!)
 
 - install following requirements (use pip or requirements.txt):
 ``pip  install -r requirements.txt``
@@ -66,7 +67,8 @@ __ __
 ```
 aiohttp>=3.7.4
 toml>=0.10.2
-colorama>=0.4.5
+cython
+colorama
 ```
 #### you **must** setup SSL for this to work! 
 
