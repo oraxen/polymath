@@ -5,8 +5,6 @@ services:
     build: .
     command: python -u run
     restart: always
-    ports:
-      - 8080:8080
     volumes:
       - ./_docker/polymath:/polymath/polymath/storage
 
