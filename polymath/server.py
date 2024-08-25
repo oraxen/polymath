@@ -37,7 +37,8 @@ class Routes:
         logging.info("Received Upload request from: "+Real_IP)
         
         User_Agent = request.headers['User-Agent'] 
-        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['uploads']] ):
+        print(User_Agent)
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent) for x in self.config['security']['known_agents']['upload']] ):
             if self.config['security']['block_unknown_agents'] and self.config['security']['reject_upload']:
                 logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
                 return web.json_response({"error": "Unknown Application"}) 
@@ -79,7 +80,7 @@ class Routes:
         
         Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
         User_Agent = request.headers['User-Agent'] 
-        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent,flags=re.IGNORECASE) for x in self.config['security']['known_agents']['download']] ):
+        if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent) for x in self.config['security']['known_agents']['download']] ):
             if self.config['security']['block_unknown_agents'] and self.config['security']['reject_download']:
                 logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
                 return web.json_response({"error": "Unknown Application"}) 
