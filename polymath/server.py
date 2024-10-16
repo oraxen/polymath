@@ -75,7 +75,6 @@ class Routes:
 
     # To download a resourcepack from its id
     async def download(self, request):
-        # if self.config['extra']['print_debug'] and self.config['extra']['debug_level'] == 0: print(self.timestamp()+Fore.GREEN+"[DOWNLOAD]"+Fore.RESET+" Received User Download request.")
         logging.debug("Received User Download request.")
         
         Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
