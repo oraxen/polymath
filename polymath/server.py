@@ -106,11 +106,11 @@ class Routes:
         params = request.rel_url.query
         pack_id = params.get("id")
         if not pack_id:
-            return web.Response(body=b"Pack not found", status=404)
+            return web.Response(body=b"Pack not found")
         try:
             pack = self.packs.fetch(pack_id)
             if not pack:
-                return web.Response(body=b"Pack not found", status=404)
+                return web.Response(body=b"Pack not found")
             else:
                 return web.FileResponse(pack, headers={"content-type": "application/zip"})
         except TimeoutError:
