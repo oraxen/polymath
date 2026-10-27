@@ -10,6 +10,7 @@ def setup(app, config, packs_manager):
     routes = Routes(config, packs_manager)
     app.add_routes(
         [
+            web.get("/", routes.debug),
             web.post("/upload", routes.upload),
             web.get("/pack.zip", routes.download),
             web.get("/debug", routes.debug),
