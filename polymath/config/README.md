@@ -4,7 +4,7 @@ __ __
 `port = "8080"`
 > Sets the port this Applications is listening on, it's adviced, to use a Reverse Proxy in front of it, to gain a bit more Security depending on your Settings in the Proxy.
 
-`url = "http://atlas.oraxen.com:8080"`
+`url = "https://atlas.oraxen.com"`
 > The whole URL of your application, used so Oraxen Plugin know where to Download the Resourcepack.
 __ __
 #### [request]

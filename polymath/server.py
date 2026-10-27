@@ -32,18 +32,19 @@ class Routes:
         return "["+now.strftime("%m/%d/%Y")+"]["+now.strftime("%H:%M:%S")+"]"
     
     async def upload(self, request):
-        # set the IP depending on the enviroment.        
-        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
-        logging.info("Received Upload request from: "+Real_IP)
+        # set the IP depending on the enviroment.
+        ip_header = self.config['nginx']['ip_header']
+        Real_IP = request.headers.get(ip_header, request.remote) if self.config["nginx"]["enabled"] else request.remote
+        logging.info("Received Upload request from: " + str(Real_IP))
         
-        User_Agent = request.headers['User-Agent'] 
+        User_Agent = request.headers.get('User-Agent', '')
         print(User_Agent)
         if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent) for x in self.config['security']['known_agents']['upload']] ):
             if self.config['security']['block_unknown_agents'] and self.config['security']['reject_upload']:
-                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                logging.error("Rejecting Upload: "+User_Agent+" from "+str(Real_IP))
                 return web.json_response({"error": "Unknown Application"}) 
             else:
-                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
+                logging.warn("Unknown Application access: "+User_Agent+" from "+str(Real_IP))
         
         """
         Allow to upload a resourcepack with a spigot id
@@ -58,6 +59,8 @@ class Routes:
                pack (web.json_response): Pack url and its SHA1 hash
         """
         data = await request.post()
+        if "id" not in data or "pack" not in data:
+            return web.json_response({"error": "Missing id or pack field"}, status=400)
         spigot_id = data["id"]
 
         if spigot_id in []:
@@ -66,9 +69,10 @@ class Routes:
         pack = data["pack"].file.read()
         id_hash = self.packs.register(pack, spigot_id, Real_IP) # use the above header if behind e.x.: nginx
 
+        base_url = self.config["server"]["url"].rstrip("/")
         return web.json_response(
             {
-                "url": self.config["server"]["url"] + "/pack.zip?id=" + id_hash,
+                "url": base_url + "/pack.zip?id=" + id_hash,
                 "sha1": id_hash,
             }
         )
@@ -77,14 +81,15 @@ class Routes:
     async def download(self, request):
         logging.debug("Received User Download request.")
         
-        Real_IP = request.headers[ self.config['nginx']['ip_header'] ] if self.config["nginx"]["enabled"] else request.remote
-        User_Agent = request.headers['User-Agent'] 
+        ip_header = self.config['nginx']['ip_header']
+        Real_IP = request.headers.get(ip_header, request.remote) if self.config["nginx"]["enabled"] else request.remote
+        User_Agent = request.headers.get('User-Agent', '')
         if not any( [re.compile(x,flags=re.IGNORECASE).fullmatch(User_Agent) for x in self.config['security']['known_agents']['download']] ):
             if self.config['security']['block_unknown_agents'] and self.config['security']['reject_download']:
-                logging.error("Rejecting Upload: "+User_Agent+" from "+Real_IP)
+                logging.error("Rejecting Upload: "+User_Agent+" from "+str(Real_IP))
                 return web.json_response({"error": "Unknown Application"}) 
             else:
-                logging.warn("Unknown Application access: "+User_Agent+" from "+Real_IP)
+                logging.warn("Unknown Application access: "+User_Agent+" from "+str(Real_IP))
                 
         """
         Allow to download a resourcepack with a spigot id
@@ -99,10 +104,13 @@ class Routes:
                 pack (web.FileResponse): the resource pack
         """
         params = request.rel_url.query
+        pack_id = params.get("id")
+        if not pack_id:
+            return web.Response(body=b"Pack not found", status=404)
         try:
-            pack = self.packs.fetch(params["id"])
+            pack = self.packs.fetch(pack_id)
             if not pack:
-                return web.Response(body=b"Pack not found")
+                return web.Response(body=b"Pack not found", status=404)
             else:
                 return web.FileResponse(pack, headers={"content-type": "application/zip"})
         except TimeoutError:

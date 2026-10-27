@@ -32,7 +32,11 @@ class PacksManager:
         return id_hash
 
     def fetch(self, id_hash):
+        if not id_hash or not id_hash.isalnum():
+            return None
         output = os.path.join(self.packs_folder, id_hash)
         if id_hash in self.registry and os.path.exists(output):
-            self.registry[id_hash]["last_download"] = time.time()
+            entry = self.registry[id_hash]
+            entry["last_download"] = int(time.time())
+            self.registry[id_hash] = entry
             return output
